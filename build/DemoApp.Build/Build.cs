@@ -11,7 +11,7 @@ class Build : NukeBuild
 {
     AbsolutePath SourceDirectory => RootDirectory / "src/DemoApp.Web";
     AbsolutePath OutputDirectory => RootDirectory / "output";
-    public static int Main () => Execute<Build>(x => x.Compile);
+    public static int Main () => Execute<Build>(x => x.Copy_Assets);
 
     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
     readonly string Configuration = IsLocalBuild ? "Debug" : "Release";
@@ -36,5 +36,12 @@ class Build : NukeBuild
         {
             DotNetBuild(SourceDirectory);
         });
-    
+
+    Target Copy_Assets => _ => _
+        .DependsOn(Compile)
+        .Executes(() => {
+            var binDir = SourceDirectory / "bin/Debug/netcoreapp2.1";
+            CopyDirectoryRecursively(binDir, OutputDirectory);
+        });
+
 }
