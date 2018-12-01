@@ -75,7 +75,7 @@ class Build : NukeBuild {
     }
 
     private AbsolutePath getGlientAppOutputDir () {
-        var clientAppOutputDir = OutputDirectory / "ClientApp/build";
+        var clientAppOutputDir = OutputDirectory / "ClientApp";
         return clientAppOutputDir;
     }
 }
