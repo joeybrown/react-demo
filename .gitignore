@@ -466,3 +466,5 @@ _Pvt_Extensions
  
 init
 output/
+
+build/DemoApp\.Build/package-lock\.json
