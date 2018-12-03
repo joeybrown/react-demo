@@ -4,78 +4,89 @@ using Nuke.Common;
 using Nuke.Common.ProjectModel;
 using Nuke.Common.Tooling;
 using Nuke.Common.Tools.Npm;
+using Nuke.Docker;
 using static Nuke.Common.EnvironmentInfo;
 using static Nuke.Common.IO.FileSystemTasks;
 using static Nuke.Common.IO.PathConstruction;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
 using static Nuke.Common.Tools.Npm.NpmTasks;
+using static Nuke.Docker.DockerTasks;
+
+//docker build -t orleanschess.host:dev -f ./src/OrleansChess.Host/Dockerfile .
 
 class Build : NukeBuild {
-    AbsolutePath SourceDirectory => RootDirectory / "src/DemoApp.Web";
+    // AbsolutePath SourceDirectory => RootDirectory / "src/DemoApp.Web";
     AbsolutePath OutputDirectory => RootDirectory / "output";
-    AbsolutePath ClientAppDirectory => SourceDirectory / "ClientApp";
+    // AbsolutePath ClientAppDirectory => SourceDirectory / "ClientApp";
+    AbsolutePath DockerDirectory => RootDirectory / "build/DemoApp.Build";
 
-    public static int Main () => Execute<Build> (x => x.Copy_Assets);
+    public static int Main () => Execute<Build> (x => x.DockerBuild);
 
-    [Parameter ("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
-    readonly string Configuration = IsLocalBuild ? "Debug" : "Release";
+    // [Parameter ("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
+    // readonly string Configuration = IsLocalBuild ? "Debug" : "Release";
 
     Target Clean => _ => _
         .Executes (() => {
-            DeleteDirectories (GlobDirectories (SourceDirectory, "bin", "obj"));
+            // DeleteDirectories (GlobDirectories (SourceDirectory, "bin", "obj"));
             EnsureCleanDirectory (OutputDirectory);
         });
 
-    Target Restore => _ => _
-        .DependsOn (Clean)
+    Target DockerBuild => _ => _
+        .DependsOn(Clean)
         .Executes (() => {
-            Npm ("install", ClientAppDirectory);
-            DotNetRestore (SourceDirectory);
+            Docker("build -t demoapp.web:prod .", DockerDirectory);
         });
 
-    Target Compile => _ => _
-        .DependsOn (Restore)
-        .Executes (() => {
-            DotNetBuild (SourceDirectory);
-            npmBuild ();
-        });
+    // Target Restore => _ => _
+    //     .DependsOn (Clean)
+    //     .Executes (() => {
+    //         Npm ("install", ClientAppDirectory);
+    //         DotNetRestore (SourceDirectory);
+    //     });
 
-    private void npmBuild () {
-        //todo: adjust for Release
-        Npm ("run build", ClientAppDirectory);
-    }
+    // Target Compile => _ => _
+    //     .DependsOn (Restore)
+    //     .Executes (() => {
+    //         DotNetBuild (SourceDirectory);
+    //         npmBuild ();
+    //     });
 
-    Target Copy_Assets => _ => _
-        .DependsOn (Compile)
-        .Executes (() => {
-            var binDir = getBinDir ();
-            var binOutputDir = getBinOutputDir ();
-            CopyDirectoryRecursively (binDir, binOutputDir);
+    // private void npmBuild () {
+    //     //todo: adjust for Release
+    //     Npm ("run build", ClientAppDirectory);
+    // }
 
-            var clientAppDir = getClientAppDir ();
-            var clientAppOutputDir = getGlientAppOutputDir ();
-            CopyDirectoryRecursively (clientAppDir, clientAppOutputDir);
-        });
+    // Target Copy_Assets => _ => _
+    //     .DependsOn (Compile)
+    //     .Executes (() => {
+    //         var binDir = getBinDir ();
+    //         var binOutputDir = getBinOutputDir ();
+    //         CopyDirectoryRecursively (binDir, binOutputDir);
 
-    private AbsolutePath getBinDir () {
-        //todo: adjust for Release
-        var binDir = SourceDirectory / "bin/Debug/netcoreapp2.1";
-        return binDir;
-    }
+    //         var clientAppDir = getClientAppDir ();
+    //         var clientAppOutputDir = getGlientAppOutputDir ();
+    //         CopyDirectoryRecursively (clientAppDir, clientAppOutputDir);
+    //     });
 
-    private AbsolutePath getBinOutputDir () {
-        var binOutputDir = OutputDirectory / "bin";
-        return binOutputDir;
-    }
+    // private AbsolutePath getBinDir () {
+    //     //todo: adjust for Release
+    //     var binDir = SourceDirectory / "bin/Debug/netcoreapp2.1";
+    //     return binDir;
+    // }
 
-    private AbsolutePath getClientAppDir () {
-        //todo: adjust for Release
-        var clientAppDir = ClientAppDirectory / "build";
-        return clientAppDir;
-    }
+    // private AbsolutePath getBinOutputDir () {
+    //     var binOutputDir = OutputDirectory / "bin";
+    //     return binOutputDir;
+    // }
 
-    private AbsolutePath getGlientAppOutputDir () {
-        var clientAppOutputDir = OutputDirectory / "ClientApp";
-        return clientAppOutputDir;
-    }
+    // private AbsolutePath getClientAppDir () {
+    //     //todo: adjust for Release
+    //     var clientAppDir = ClientAppDirectory / "build";
+    //     return clientAppDir;
+    // }
+
+    // private AbsolutePath getGlientAppOutputDir () {
+    //     var clientAppOutputDir = OutputDirectory / "ClientApp";
+    //     return clientAppOutputDir;
+    // }
 }
