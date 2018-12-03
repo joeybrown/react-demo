@@ -36,13 +36,13 @@ class Build : NukeBuild {
     Target Compile => _ => _
         .DependsOn (Restore)
         .Executes (() => {
+            NpmBuild ();
             DotNetBuild (SourceDirectory);
-            npmBuild ();
         });
 
-    private void npmBuild () {
+    private void NpmBuild () {
         //todo: adjust for Release
-        Npm ("run build", ClientAppDirectory);
+        Npm ($"run build --prefix {ClientAppDirectory}");
     }
 
     Target Copy_Assets => _ => _

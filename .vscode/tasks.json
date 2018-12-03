@@ -20,6 +20,20 @@
                 "${workspaceFolder}/build/DemoApp.Build/DemoApp.Build.csproj" 
             ], 
             "problemMatcher": "$msCompile" 
-        } 
+        },
+        {
+			"label": "build-build-build-web",
+			"dependsOn": [
+				"build-build"
+			],
+			"command": "dotnet", 
+            "type": "process", 
+            "args": [ 
+                "run", 
+                "--project",
+                "${workspaceFolder}/build/DemoApp.Build" 
+            ], 
+            "problemMatcher": "$msCompile" 
+		}
     ] 
 }
