@@ -59,7 +59,7 @@ class Build : NukeBuild {
 
     private AbsolutePath getBinDir () {
         //todo: adjust for Release
-        var binDir = SourceDirectory / "bin/Debug/netcoreapp2.1";
+        var binDir = SourceDirectory / "bin" / "Debug" / "netcoreapp2.1";
         return binDir;
     }
 
@@ -75,7 +75,7 @@ class Build : NukeBuild {
     }
 
     private AbsolutePath getGlientAppOutputDir () {
-        var clientAppOutputDir = OutputDirectory / "ClientApp";
+        var clientAppOutputDir = OutputDirectory / "ClientApp" / "build";
         return clientAppOutputDir;
     }
 }
